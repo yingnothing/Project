@@ -9,10 +9,10 @@
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container{
     width: 100%;
-    height: 50px;
+    height: $base-logo-height;
     display: flex;
     justify-content: center;
     align-items: center;
