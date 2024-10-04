@@ -54,7 +54,7 @@ const loginForm=reactive<RuleForm>({
 })
 // 自定义规则点失去焦点就触发函数
 const validateUserName=(_rule: any, value: any, callback: any)=>{
-    if(/^[a-zA-Z]{1}[A-Z|a-z|0-9]{5,29}/.test(value)){
+    if(/^[a-zA-Z]{5,29}/.test(value)){
         callback()
     }else{
         callback(new Error('输入的用户名错误'))
