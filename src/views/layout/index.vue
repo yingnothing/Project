@@ -22,7 +22,8 @@
 
 <script lang="ts" setup>
 import Logo from './logo/index.vue';
-import Menu from './menu/index.vue'
+// 这个是外层的el-menu
+import Menu from './menu/index.vue';
 import Main from './main/index.vue'
 import Tabbar from './tabbar/index.vue'
 // 获取路由规则,传给菜单
