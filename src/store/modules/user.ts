@@ -1,3 +1,4 @@
+// 用户仓库
 import { defineStore } from 'pinia'
 
 // 引入登录接口
@@ -8,7 +9,7 @@ export const useUserStore = defineStore('User', {
   state: () => {
     return { 
       token: localStorage.getItem('TOKEN'),
-
+      
      }
   },
 

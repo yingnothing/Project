@@ -1,12 +1,13 @@
 <template>
-    <div class="container">
-        <img src="../../assets/vue.svg" alt="">
-        <p>广工大平台</p>
+    <div class="container" v-show="!settingIconStore.fold">
+        <img src="../../../assets/vue.svg" alt="">
+        <p >广工大平台</p>
     </div>
 </template>
 
 <script setup lang="ts">
-
+import useSettingIconStore from '../../../store/modules/SettingIcon';
+const settingIconStore = useSettingIconStore()
 </script>
 
 <style scoped lang="scss">

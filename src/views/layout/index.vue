@@ -1,34 +1,19 @@
 <template>
     <div class="layout_container">
-
-        <div class="layout_tabbar">
-            导航
+        <!-- 导航 -->
+        <div class="layout_tabbar" :class="{ tabbar_expend: settingIconStore.fold }">
+            <Tabbar></Tabbar>
         </div>
-        <div class="layout_slider">
-            <logo />
+        <!-- 左侧栏 -->
+        <div class="layout_slider" :class="{ fold: settingIconStore.fold }">
+            <Logo />
             <!-- 菜单的选项 -->
-            <div>
-                <!-- 查询ui组件库scrollbar的属性，写在.scrollbar里面 -->
-                <el-scrollbar class="scrollbar">
-                    <!-- 菜单折叠等 -->
-                    <el-menu>
-                        <el-menu-item index="1" >首页</el-menu-item>
-                        <el-menu-item index="2" >数据大屏</el-menu-item>
-                        <!-- 折叠 -->
-                        <el-sub-menu index="1">
-                            <template #title>
-                                <span>权限管理</span>
-                            </template>
-                                <el-menu-item index="1-1">用户管理</el-menu-item>
-                                <el-menu-item index="1-2">角色管理</el-menu-item>
-                                <el-menu-item index="1-3">菜单管理</el-menu-item>
-                        </el-sub-menu>
-                    </el-menu>
-                </el-scrollbar>
-            </div>
+            <Menu :constantRoute="constantRoute"></Menu>
         </div>
-        <div class="layout_main">
-            <p>段落</p>
+        <!-- 内容 -->
+        <div class="layout_main" :class="{ main_expend: settingIconStore.fold }">
+            <!-- 这里呈现的是二级路由 -->
+            <Main></Main>
         </div>
     </div>
 
@@ -36,15 +21,22 @@
 </template>
 
 <script lang="ts" setup>
-import logo from './logo.vue';
-
+import Logo from './logo/index.vue';
+import Menu from './menu/index.vue'
+import Main from './main/index.vue'
+import Tabbar from './tabbar/index.vue'
+// 获取路由规则,传给菜单
+import { constantRoute } from '../../router/routes';
+// 引入控制折叠的仓库
+import useSettingIconStore from '../../store/modules/SettingIcon';
+const settingIconStore = useSettingIconStore()
 </script>
 
 <style lang="scss">
 .layout_container {
     width: 100%;
     height: 100vh;
-    background: red;
+
 
     // 菜单
     .layout_slider {
@@ -54,19 +46,8 @@ import logo from './logo.vue';
         height: 100vh;
         background-color: white;
 
-        // 菜单里的选项
-        .scrollbar {
-            //这里的height是设置所能呈现的内容的高度，
-            // 减去logo的高度，来确定高度，防止菜单选项过多而溢出
-            height: calc(100% - $base-logo-height);
-
-            // 设置字体和背景颜色
-            .el-menu{
-                --el-menu-bg-color:width;
-            }
-            .el-menu-item,.el-sub-menu {
-                --el-menu-text-color: rgb(148, 37, 137);
-            }
+        &.fold {
+            width: $fold-menu-width;
         }
     }
 
@@ -74,10 +55,14 @@ import logo from './logo.vue';
     .layout_tabbar {
         position: fixed;
         width: calc(100% - $base-menu-width);
-        height: 70px;
+        height: $base-tabbar-height;
         left: $base-menu-width;
         top: 0;
-        background-color: green;
+        // 导航是否向左展开
+        &.tabbar_expend {
+            width: calc(100vw - $fold-menu-width);
+            left: $fold-menu-width;
+        }
     }
 
     .layout_main {
@@ -86,9 +71,15 @@ import logo from './logo.vue';
         left: $base-menu-width;
         // 减去菜单的宽度
         width: calc(100% - $base-menu-width);
-        top: 70px;
+        // 顶部导航的距离
+        top: $base-tabbar-height;
         overflow: auto;
         background-color: yellow;
+          // main是否向左展开
+        &.main_expend{
+            width: calc(100vw - $fold-menu-width);
+            left: $fold-menu-width;
+        }
     }
 }
 
