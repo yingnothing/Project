@@ -3,12 +3,16 @@ import { defineStore } from "pinia";
 const useSettingIconStore = defineStore('settingIcon', {
     state: () => {
         return {
-            fold:false
+            fold:false,
+            clickRefresh:true
         }
     },
     actions: {
         changeFold(){
             this.fold=!this.fold
+        },
+        refresh(){
+            this.clickRefresh=!this.clickRefresh
         }
     }
 })

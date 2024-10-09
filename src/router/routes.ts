@@ -32,7 +32,6 @@ export const constantRoute = [
         ],
         // 添加显示该路由的名字
         meta: {
-            title: 'layout',
             hidden: false,
             icon: 'House'
         },
@@ -59,6 +58,7 @@ export const constantRoute = [
             hidden: false,
             icon: 'Lock'
         },
+        redirect:'/acl/user',
         children: [
             {
                 path: '/acl/user',
@@ -97,10 +97,11 @@ export const constantRoute = [
         component: () => import('../views/layout/index.vue'),
         name: 'Product',
         meta: {
-            title: '商品管理',
+            title: '品牌管理',
             hidden: false,
             icon: 'Goods'
         },
+        redirect:'/product/trademark',
         children: [
             {
                 path: '/product/trademark',

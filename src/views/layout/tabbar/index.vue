@@ -1,23 +1,27 @@
 <!-- 顶部导航 -->
 <template>
     <div class="tabbar">
-        <div class="tabbar_left"  @click="settingIconStore.changeFold">
-            <el-icon style="margin-right: 5px;cursor: pointer; ">
-                <component :is="settingIconStore.fold?'Expand':'Fold'"></component>
+        <div class="tabbar_left">
+            <el-icon style="margin-right: 8px;cursor: pointer; " @click="settingIconStore.changeFold">
+                <component :is="settingIconStore.fold ? 'Expand' : 'Fold'"></component>
             </el-icon>
             <!-- 面包屑 -->
             <el-breadcrumb separator-icon="CaretRight">
-                <el-breadcrumb-item>权限管理</el-breadcrumb-item>
-                <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+                <!-- 添加to属性实现点击面包屑可以跳转 -->
+                <el-breadcrumb-item v-for="(item, index) in $route.matched" :key="index" :to="item.path" v-show="item.meta.title">
+                    <el-icon>
+                        <component :is="item.meta.icon"></component>
+                    </el-icon>
+                    {{ item.meta.title }}
+                </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="tabbar_right">
             <!-- 按钮 -->
-            <el-button icon="Refresh" circle />
+            <el-button icon="Refresh" circle @click="refresh"/>
             <el-button icon="FullScreen" circle />
             <el-button icon="Setting" circle />
-            <img src="../../../assets/vue.svg" 
-            style="width: 30px; height: 30px; 
+            <img src="../../../assets/vue.svg" style="width: 30px; height: 30px; 
             margin-left: 5px;
             ">
             <!-- 下拉菜单 -->
@@ -41,7 +45,14 @@
 <script setup lang="ts">
 // 引入控制折叠的仓库
 import useSettingIconStore from '../../../store/modules/SettingIcon';
-const settingIconStore=useSettingIconStore()
+const settingIconStore = useSettingIconStore()
+// 获取路由的meta
+import { useRoute } from 'vue-router';
+const $route = useRoute()
+// 点击刷新按钮后更新仓库中的标志
+const refresh=()=>{
+    settingIconStore.refresh()
+}
 </script>
 
 <style scoped lang="scss">
@@ -59,9 +70,9 @@ const settingIconStore=useSettingIconStore()
 .tabbar_left {
     display: flex;
 }
-.tabbar_right{
+
+.tabbar_right {
     display: flex;
     align-items: center;
 }
-
 </style>
