@@ -88,7 +88,7 @@ const login=async()=>{
     // 如果表单校验未完成，不进行验证
     await Form.value.validate()
     try{
-        // 这个返回Peomise
+        // 这个返回Promise
         await userStore.userLogin(loginForm)
         // 跳转
         $router.push('/')
