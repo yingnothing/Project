@@ -91,7 +91,7 @@ const login=async()=>{
     // 如果表单校验未完成，不进行验证
     await Form.value.validate()
     try{
-        // 这个返回Promise
+        // 这个返回Promise，获取用户token
         await userStore.userLogin(loginForm)
         // 跳转,有参数就往参数上跳，否则往首页上跳
         $router.push({path:redirect||'/'})

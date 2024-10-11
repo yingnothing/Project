@@ -73,8 +73,9 @@ const changeFullScreen = () => {
     }
 }
 // 退出登录
-const logOff=()=>{
-    userStore.clearUserMessage()
+const logOff=async ()=>{
+    // userStore.clearUserMessage()，替换未
+    await userStore.userLogout()
     // 跳转时使用路由quary传参，将当前路径作为参数
     $router.push({path:'/login',query:{redirect:$route.path}})
 }

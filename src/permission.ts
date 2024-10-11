@@ -22,16 +22,18 @@ router.beforeEach(async (to, _from:any, next) => {
             // 去其它任何地方，先判断是否已通过token拿到用户信息(即发送请求并存在pinia中)
             if (userStore.username) {
                 next()
-            } else {
+            } else {// 用户信息被刷新了
                 try {                
                     // 这个是通过token向服务器发送请求，所以可能失败
                     await userStore.getUserInfo()
                     // 发送完信息后再放行
                     next()
                 } catch(error) {
-                    // token过期，拿不到用户数据
-                    userStore.clearUserMessage()
-                    router.push({path:'/login',query:{redirect:to.path}})
+                    // token过期，拿不到用户数据,进行退出登录操作
+                    await userStore.userLogout()
+                    next({path:'/login',query:{redirect:to.path}})
+                    // router.push({path:'/login',query:{redirect:to.path}})
+                    //  next();
                 }
             }
         }
@@ -46,6 +48,6 @@ router.beforeEach(async (to, _from:any, next) => {
     }
 
 })
-router.afterEach((to, from) => {
+router.afterEach((_to, _from) => {
     nprogress.done()
 })
