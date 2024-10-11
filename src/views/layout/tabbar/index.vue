@@ -26,7 +26,7 @@
             margin:0 8px;
             ">
             <!-- 下拉菜单 -->
-            <el-dropdown>
+            <el-dropdown >
                 <span class="el-dropdown-link">
                     {{userStore.username}}
                     <el-icon class="el-icon--right">
@@ -34,8 +34,8 @@
                     </el-icon>
                 </span>
                 <template #dropdown>
-                    <el-dropdown-menu>
-                        <el-dropdown-item>退出登录</el-dropdown-item>
+                    <el-dropdown-menu >
+                        <el-dropdown-item @click="logOff">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -49,10 +49,13 @@ import useSettingIconStore from '../../../store/modules/SettingIcon';
 const settingIconStore = useSettingIconStore()
 // 引入用户仓库获取用户名和头像
 import { useUserStore } from '../../../store/modules/user';
-// 获取路由的meta
+// 获取路由的meta渲染面包屑
 import { useRoute } from 'vue-router';
+// 退出登录时进行路由跳转
+import { useRouter } from 'vue-router';
 const $route = useRoute()
 const userStore=useUserStore()
+const $router=useRouter()
 // 点击刷新按钮后更新仓库中的标志
 const refresh = () => {
     settingIconStore.refresh()
@@ -68,6 +71,12 @@ const changeFullScreen = () => {
     } else {
         document.documentElement.requestFullscreen()
     }
+}
+// 退出登录
+const logOff=()=>{
+    userStore.clearUserMessage()
+    // 跳转时使用路由quary传参，将当前路径作为参数
+    $router.push({path:'/login',query:{redirect:$route.path}})
 }
 </script>
 

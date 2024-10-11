@@ -11,11 +11,13 @@ import globalcomponents from './components'
 import './styles/index.scss'
 // 注册路由插件
 import router from './router';
-// pinia
-import { createPinia } from 'pinia'
+// pinia，在store的index.ts创建一个pinia实例，在这里使用
+import pinia from './store'
+// 执行路由守卫
+import './permission'
 
 const app = createApp(App)
-const pinia = createPinia()
+
 app.use(globalcomponents)
 
 app.use(ElementPlus, {

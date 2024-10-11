@@ -42,6 +42,8 @@ import { useUserStore } from '../../store/modules/user';
 import { useRouter } from 'vue-router';
 // 引入提示框
 import { ElNotification } from 'element-plus'
+// 引入route拿到当前的query参数
+import { useRoute } from 'vue-router';
 // 定义校验
 interface RuleForm{
     username:String,
@@ -77,7 +79,8 @@ const rules = reactive({
 // 表单里有一个方法validate，验证是否全部通过，返回一个promise
 // 获取表单
 let Form=ref()
-
+const $route=useRoute()
+let redirect:any=$route.query.redirect
 // 获取时间
 import { getTime } from '../../utils/getTime';
 const userStore=useUserStore()
@@ -90,8 +93,9 @@ const login=async()=>{
     try{
         // 这个返回Promise
         await userStore.userLogin(loginForm)
-        // 跳转
-        $router.push('/')
+        // 跳转,有参数就往参数上跳，否则往首页上跳
+        $router.push({path:redirect||'/'})
+
         ElNotification({
         title: mes,
         message: '登录成功！',

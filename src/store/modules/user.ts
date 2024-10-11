@@ -31,7 +31,7 @@ export const useUserStore = defineStore('User', {
     }
     },
     // 获取用户信息
-    async userInfo(){
+    async getUserInfo(){
       const res=await userInfo()
       console.log(res);
       // 如果成功，则将用户信息存在pinia中，方便其它组件进行渲染
@@ -40,10 +40,20 @@ export const useUserStore = defineStore('User', {
         this.username=res.data.checkUser.username
          // @ts-ignore
         this.avatar=res.data.checkUser.avatar
+        return 'ok';
       }else{
-
+        return Promise.reject('token已过期')
       }
       
+    },
+    // 清除用户信息
+    clearUserMessage(){
+      this.username=''
+      this.avatar=''
+      // 这个token的清除或者是放在一个公共的地方
+      this.token=''
+      // localStorage.setItem('TOKEN',''),应该使用remove
+      localStorage.removeItem('TOKEN')
     }
   },
 })
