@@ -1,29 +1,26 @@
-export interface loginForm{
-    username:String,
-    password:String
-}
 
-// 用户登录的返回类型
-export interface datatype{
-    token:string
-}
-export interface loginRespond{
-    code:number,
-    data:datatype
-}
-// 用户相关信息的返回类型
-export interface user{
-    userId:number,
-    avatar:string,
+// 登录发送请求携带的参数
+export interface loginFormData{
     username:string,
-    password:string,
-    desc:string,
-    roles:string[],
-    buttons:string[],
-    routes:string[],
-    token:string
+    password:string
 }
-export interface infoRespond{
+// 服务器返回的通用数据格式
+export interface responseData{
     code:number,
-    data:user
+    message:string,
+    ok:boolean
+}
+// 登录接口返回的数据类型
+export interface loginRespondData extends responseData{
+    data:string
+}
+// 获取用户信息返回的数据类型
+export interface userInfoResponseData extends responseData{
+    data:{
+        routes:string[],
+        buttons:string[],
+        roles:string[],
+        name:string,
+        avatar:string
+    }
 }
