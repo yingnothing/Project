@@ -32,7 +32,6 @@ export const useUserStore = defineStore('User', {
     // 获取用户信息方法
     async getUserInfo(){
       const res:userInfoResponseData=await reqUserInfo()
-      console.log(res);
       // 如果成功，则将用户信息存在pinia中，方便其它组件进行渲染
       if(res.code===200){
          // @ts-ignore

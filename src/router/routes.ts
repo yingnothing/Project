@@ -97,7 +97,7 @@ export const constantRoute = [
         component: () => import('../views/layout/index.vue'),
         name: 'Product',
         meta: {
-            title: '品牌管理',
+            title: '商品管理',
             hidden: false,
             icon: 'Goods'
         },
@@ -108,7 +108,7 @@ export const constantRoute = [
                 component: () => import('../views/product/trademark/index.vue'),
                 name: 'trademark',
                 meta: {
-                    title: '商品管理',
+                    title: '品牌管理',
                     icon: 'ShoppingCartFull',
                     hidden: false
                 }

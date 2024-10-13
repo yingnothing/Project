@@ -74,6 +74,7 @@ const settingIconStore = useSettingIconStore()
         width: calc(100% - $base-menu-width);
         // 顶部导航的距离
         top: $base-tabbar-height;
+        padding:10px;
         overflow: auto;
         background-color: yellow;
           // main是否向左展开
