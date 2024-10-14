@@ -22,10 +22,7 @@ defineProps(['constantRoute'])
 const $route = useRoute()
 
 </script>
-<script lang="ts">
 
-
-</script>
 <style scoped lang="scss">
 // 菜单里的选项
 .scrollbar {

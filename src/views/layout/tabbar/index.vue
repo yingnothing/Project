@@ -79,7 +79,12 @@ const logOff=async ()=>{
     // 跳转时使用路由quary传参，将当前路径作为参数
     $router.push({path:'/login',query:{redirect:$route.path}})
 }
+// 定义组件名称
+defineOptions({
+  name: "tabbar"
+})
 </script>
+
 
 <style scoped lang="scss">
 .tabbar {

@@ -9,7 +9,11 @@
 import useSettingIconStore from '../../../store/modules/SettingIcon';
 const settingIconStore = useSettingIconStore()
 </script>
-
+<script lang="ts">
+  export default {
+    name: "logo"
+  }
+</script>
 <style scoped lang="scss">
 .container{
     width: 100%;

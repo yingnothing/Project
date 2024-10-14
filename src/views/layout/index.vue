@@ -32,7 +32,11 @@ import { constantRoute } from '../../router/routes';
 import useSettingIconStore from '../../store/modules/SettingIcon';
 const settingIconStore = useSettingIconStore()
 </script>
-
+<script lang="ts">
+  export default {
+    name: "layout"
+  }
+</script>
 <style lang="scss">
 .layout_container {
     width: 100%;

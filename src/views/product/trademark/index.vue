@@ -34,9 +34,20 @@
      每页显示条目个数 page-size
      每页显示个数选择器的选项设置 page-sizes
      	分页大小 size
+      当选择页数发生改变的时候，就重新发送请求，发送请求需要的currentPage和page_size已通过v-model实时更新 current-change
+      更改每页几条数据时触发size-change
      -->
-    <el-pagination v-model:current-page="currentPage" v-model:page-size="page_size" :page-sizes="[3, 5, 7, 9]"
-      size="default" :background="true" layout="sizes, prev, pager, next, ->,jumper,total" :total="tableTotal" />
+    <el-pagination 
+    
+    @current-change="getTrademark"
+    @size-change="sizeChange"
+    v-model:current-page="currentPage" 
+    v-model:page-size="page_size"
+    :page-sizes="[3, 5, 7, 9]"
+    size="default" 
+    :background="true" 
+    layout="sizes, prev, pager, next, ->,jumper,total" 
+    :total="tableTotal" />
   </el-card>
 </template>
 
@@ -50,13 +61,22 @@ const page_size = ref<number>(4)
 let tableTotal=ref<number>(10)
 // 获取商品数据
 const getTrademark = async () => {
+  // 请求指定页数和数量的数据，默认第一页四个数据，可以通过点击页面对参数进行更新
   const res = await reqBaseTrademark(currentPage.value, page_size.value)
   console.log(res);
-  tableData = res.data.records
+  tableData.value = res.data.records
   tableTotal.value=res.data.total
 }
 onMounted(() => getTrademark())
-
+// 更改每页为几条数据时
+const sizeChange=()=>{
+  currentPage.value=1
+  getTrademark()
+}
 </script>
-
+<script lang="ts">
+  export default {
+    name: "trademark"
+  }
+</script>
 <style scoped></style>

@@ -19,6 +19,10 @@ watch(()=>settingStore.clickRefresh,()=>{
     flag.value=false
     nextTick(()=>flag.value=true)
 })
+// 定义组件名称
+defineOptions({
+  name: "Main"
+})
 </script>
 
 <style scoped>
