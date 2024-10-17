@@ -54,7 +54,7 @@ const loginForm=reactive<RuleForm>({
     username:'admin',
     password:'111111'
 })
-// 自定义规则点失去焦点就触发函数
+// 自定义规则改变就触发函数
 const validateUserName=(_rule: any, value: any, callback: any)=>{
     if(/^[a-zA-Z]{5,29}/.test(value)){
         callback()
@@ -65,7 +65,6 @@ const validateUserName=(_rule: any, value: any, callback: any)=>{
 
 // 定义规则，在el-form引入规则，在el-form引入module和loginForm相关联，在el-item引入具体变量
 const rules = reactive({
-
     username:[
         { required:true,validator: validateUserName, trigger: 'change' }
         // {message:'请输入你的用户名', trigger: 'blur'},
