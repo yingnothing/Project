@@ -26,9 +26,14 @@
       <el-table-column fixed="right" label="品牌操作" min-width="120">
         <template v-slot:default="{ row }">
           <el-button link type="primary" size="small" icon="Edit" @click="edit(row)">修改</el-button>
-          <el-button link type="danger" size="small" icon="Delete" @click="deleteTrademark">
+            <el-popconfirm title="确认删除？" @confirm="deleteTrademark(row)">
+              <template #reference>
+                <el-button>删除</el-button>
+              </template>
+            </el-popconfirm>
+          <!-- <el-button link type="danger" size="small" icon="Delete" @click="deleteTrademark(row)">
             删除
-          </el-button>
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -54,11 +59,11 @@
     :total="tableTotal" />
     <!-- 弹窗组件，用于添加商品 -->
      <el-dialog v-model="dialogFormVisible" :title="dialogForm.id?'修改品牌名称或logo':'添加品牌名称及logo'" width="40%" center top="25vh">
-      <el-form :model="dialogForm" :rules="rules" style="width: 80%;">
+      <el-form :model="dialogForm" :rules="rules" style="width: 80%;" ref="formRef">
         <el-form-item label="输入名称:" prop="tmName" label-width="130px">
           <el-input v-model="dialogForm.tmName" width="200px"/>
         </el-form-item>
-        <el-form-item label="上传该品牌的logo" label-width="130px">
+        <el-form-item label="上传该品牌的logo" label-width="130px" prop="logo" >
           <!--
            上传图片组件
            action 要将图片上传到的服务器的地址，当上传图片时就会发送请求，要在接口文档地址前面加上api，服务器将会返回文件的访问 URL
@@ -94,11 +99,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref,reactive } from 'vue'
-import { reqBaseTrademark,addTrademark,editTrademark } from '../../../api/product/trademark/index'
+import { onMounted, ref,reactive,nextTick } from 'vue'
+import { reqBaseTrademark,addTrademark,editTrademark,removeTrademark } from '../../../api/product/trademark/index'
 import { ElMessage, UploadProps } from 'element-plus';
 let tableData = ref([])
-
+// 获取表单实例，方便调用表单方法
+let formRef=ref()
 const currentPage = ref<number>(1)
 const page_size = ref<number>(4)
 let tableTotal=ref<number>(10)
@@ -122,6 +128,13 @@ const add=()=>{
   dialogForm.tmName=''
   dialogForm.logoUrl=''
   dialogFormVisible.value=true
+  // 将表单校验进行清空，可能会出现formRef为undefine的情况
+  // formRef?.value.clearValidate('tmName')
+  // formRef?.value.clearValidate('logo')
+  nextTick(()=>{
+    formRef.value.clearValidate('tmName')
+    formRef.value.clearValidate('logo')
+  })
 }
 // 获取商品数据
 const getTrademark = async () => {
@@ -130,24 +143,63 @@ const getTrademark = async () => {
   tableData.value = res.data.records
   tableTotal.value=res.data.total
 }
+// logo名称校验函数
+const validateTmName=(_rule: any, value: any, callback: any)=>{
+  if(value.trim().length<2){
+    callback(new Error('名称应大于等于2'))
+  }else{
+    formRef.value.clearValidate('tmName')
+    callback()
+  }
+}
+// 上传图片校验函数
+const validateLogo=(_rule: any, _value: any, callback: any)=>{
+  // value为undefine，不清楚为什么
+  if(dialogForm.logoUrl){
+    callback()
+  }else{
+    callback(new Error('请上传logo'))
+  }
+}
 // 自定义弹窗规则
 const rules = reactive({
     tmName:[
-        {required:true,message:'输入品牌名称', trigger: 'blur'},
-        {min:2,message:'名称长度至少为2',trigger: 'blur'}
+        {required:true,validator:validateTmName, trigger: 'blur'},
+    ],
+    logo:[
+    {required:true,validator:validateLogo, trigger: 'blur'},
     ]
 })
+
 onMounted(() => getTrademark())
 // 点击编辑执行该函数
 const edit=(row:any)=>{
+  nextTick(()=>{
+    formRef.value?.clearValidate('tmName')
+    formRef.value?.clearValidate('logo')
+  })
   Object.assign(dialogForm,row)
   dialogFormVisible.value=true
-  
-  
 }
 // 点击删除执行该函数
-const deleteTrademark=()=>{
-  dialogFormVisible.value=true
+const deleteTrademark=async (row:any)=>{
+  const res=await removeTrademark(row.id)
+  console.log(res.code);
+  if(res.code===200){
+    ElMessage({
+      type:'success',
+      message:'已成功删除(*^_^*)'
+    })
+  }else{
+    ElMessage({
+      type:'success',
+      message:'修改品牌失败/(ㄒoㄒ)/~~'
+    })
+  }
+
+  // 更新数据
+  await getTrademark()
+
 }
 // 点击取消执行该函数
 const cancel=()=>{
@@ -155,6 +207,8 @@ const cancel=()=>{
 }
 // 点击确定执行该函数
 const confirm=async ()=>{
+  // 对所有表单进行校验，返回promise
+  await formRef.value.validate()
   let res:any
   if(dialogForm.id){
     console.log(dialogForm);
@@ -202,6 +256,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile:any) => {
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response:any,_uploadFile:any) => {
   // response.data即为上传成功后图片的地址
   dialogForm.logoUrl=response.data
+  formRef.value.clearValidate('logo')
 }
 </script>
 <script lang="ts">
