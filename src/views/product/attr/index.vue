@@ -1,75 +1,213 @@
 <template>
-    <el-card style="max-width: 100%">
-        <template #header>
+    <div>
+        <el-card style="max-width: 100% ;margin-bottom: 20px;">
             <div class="card-header">
                 <!-- 行内表单 -->
-                 <el-form :inline="true" >
-                    <el-form-item label="第一种分类"> 
+                <el-form :inline="true">
+                    <el-form-item label="第一种分类">
                         <!-- selectOne拿到的是item.id -->
-                        <el-select placeholder="请选择第一种分类"    style="width:220px ;"  v-model="attrStore.selectOne" @change="hander1">
+                        <el-select placeholder="请选择第一种分类" style="width:220px ;" v-model="attrStore.selectOne"
+                            @change="hander1" :disabled="isAdd">
                             <template v-for="item in attrStore.categoryOneData">
-                                <el-option :label="item.name" :value="item.id" >
+                                <el-option :label="item.name" :value="item.id">
                                 </el-option>
                             </template>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="第二种分类"> 
-                        <el-select placeholder="请选择第二种分类" style="width:220px ;" v-model="attrStore.selectTow" @change="hander2">
+                    <el-form-item label="第二种分类">
+                        <el-select placeholder="请选择第二种分类" style="width:220px ;" v-model="attrStore.selectTow"
+                            @change="hander2" :disabled="isAdd">
                             <el-option v-for="item in attrStore.categoryTowData" :label="item.name" :value="item.id">
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="第三种分类"> 
-                        <el-select placeholder="第三种分类" style="width:220px ;" v-model="attrStore.selectThree" @change="hander3">
+                    <el-form-item label="第三种分类">
+                        <el-select placeholder="第三种分类" style="width:220px ;" v-model="attrStore.selectThree"
+                            @change="hander3" :disabled="isAdd">
                             <el-option v-for="item in attrStore.categoryThreeData" :label="item.name" :value="item.id">
                             </el-option>
                         </el-select>
                     </el-form-item>
-                 </el-form>
+                </el-form>
             </div>
-        </template>
-        <div class="card-body">
-            <!-- 当没有选择三个选项的话不能添加 -->
-            <el-button type="primary" icon="Plus" :disabled="!attrStore.selectThree">添加属性</el-button>
-            <el-table :border="true" :data="attrStore.categoryList">
+        </el-card>
+        <!-- 下方列表渲染 -->
+        <el-card v-show="!isAdd">
+            <div class="card-body">
+                <!-- 当没有选择三个选项的话不能添加 -->
+                <el-button type="primary" icon="Plus" :disabled="!attrStore.selectThree"
+                    @click="addAttr">添加属性</el-button>
+                <el-table :border="true" :data="attrStore.categoryList">
+                    <el-table-column label="序号" type="index" width="80px">
+                    </el-table-column>
+                    <el-table-column label="属性名称" width="180px" prop="attrName">
+                    </el-table-column>
+                    <el-table-column label="属性值名称" width="auto">
+                        <template #="{ row }">
+                            <el-tag v-for="item in row.attrValueList" :key="row.attrValueList.id"
+                                style="margin-right: 10px;">
+                                {{ item.valueName }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
+                    <!-- 按钮 -->
+                    <el-table-column label="操作" width="200px">
+                        <template #>
+                            <el-button link type="primary" size="small" icon="Edit">修改</el-button>
+                            <el-popconfirm title="确认删除？">
+                                <template #reference>
+                                    <el-button>删除</el-button>
+                                </template>
+                            </el-popconfirm>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </el-card>
+        <!-- 添加属性时切换到该卡片 -->
+        <el-card v-show="isAdd">
+            <!-- 属性名称 -->
+            <el-form :inline="true">
+                <el-form-item label="属性名称">
+                    <el-input v-model="attrParams.attrName">
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            <!-- 为该属性添加属性值 -->
+            <el-button type="primary" icon="Plus" @click="addAttrValue">
+                添加属性值
+            </el-button>
+            <el-button>
+                取消
+            </el-button>
+            <el-table style="margin-top: 15px;" :border="true" :data="attrParams.attrValueList">
                 <el-table-column label="序号" type="index" width="80px">
                 </el-table-column>
-                <el-table-column label="属性名称"  width="180px" prop="attrName">
-                </el-table-column>
-                <el-table-column label="属性值名称" width="auto">
-                </el-table-column>
-                <el-table-column label="操作" width="120px">
+                <el-table-column label="属性值">
+                    <template #="{ row, $index }">
+                        <el-input placeholder="请输入属性值名称" v-model="row.valueName" v-if="row.choose"
+                            @blur="toLook(row, $index)"></el-input>
+                        <div v-else @click="row.choose = true">
+                            {{ row.valueName }}
+                        </div>
+                    </template>
+                </el-table-column> <el-table-column label="属性值操作">
+
                 </el-table-column>
             </el-table>
-        </div>
-    </el-card>
+            <!-- 保存和取消按钮 -->
+            <div style="margin-top: 15px;">
+                <el-button type="primary" @click="save">保存</el-button>
+                <el-button @click="isAdd = false">取消</el-button>
+            </div>
+        </el-card>
+    </div>
+
 </template>
 
 <script setup lang="ts">
-import { onMounted, } from 'vue';
-import { useAttrStore } from '../../../store/modules/attr';
+import { onMounted, reactive, ref } from 'vue';
+import { useAttrStore, } from '../../../store/modules/attr';
+import { reqAddOrUpdateAttr } from '../../../api/product/attr';
+import { ElMessage } from 'element-plus';
 
-const attrStore=useAttrStore()
-
+const attrStore = useAttrStore()
+// 管理卡片切换及选项的可选状态
+let isAdd = ref(false)
+// 收集新增的属性数据
+let attrParams: any = reactive({
+    attrName: "",
+    attrValueList: [],
+    categoryId: '',
+    categoryLevel: 3
+})
 // 当selectOne变化时就调用第二个接口获取数据
-const hander1=async ()=>{
-    attrStore.selectTow=''
-    attrStore.selectThree=''
-    attrStore.categoryThreeData=[]
+const hander1 = async () => {
+    attrStore.selectTow = ''
+    attrStore.selectThree = ''
+    attrStore.categoryThreeData = []
     await attrStore.getC2()
 }
 // 当selectTow变化时就调用第三个接口获取数据
-const hander2=async ()=>{
-    attrStore.selectThree=''
+const hander2 = async () => {
+    attrStore.selectThree = ''
     await attrStore.getC3()
 }
 // 当selectThree变化时就调用接口获取属性列表
-const hander3=async ()=>{
+const hander3 = async () => {
     await attrStore.getCL()
 }
-onMounted(async()=>{
+// 添加属性
+const addAttr = () => {
+    isAdd.value = true
+}
+// 添加属性值
+const addAttrValue = () => {
+    // 将数据清空
+    attrParams.attrName = ''
+    attrParams.attrValueList = []
+    // 给attrParams.attrValueList数组添加对象，从而增加input
+    attrParams.attrValueList.push({
+        valueName: '',
+        // 增加一个判断是否被选中的标志
+        choose: true
+    })
+}
+// 保存属性值，发送请求
+const save = async () => {
+    if (attrParams.attrValueList.length === 0 || !attrParams.attrName) {
+        ElMessage({
+            type: 'error',
+            message: '缺少必要内容'
+        })
+        return
+    }
+    isAdd.value = false
+    // 保存第三分类的id
+    attrParams.categoryId = attrStore.selectThree
+    // 发送请求
+    const res: any = await reqAddOrUpdateAttr(attrParams)
+    if (res.code === 200) {
+        ElMessage({
+            type: 'success',
+            message: '添加成功'
+        })
+
+        // 更新列表数据
+        await attrStore.getCL()
+    } else {
+        ElMessage({
+            type: 'error',
+            message: '添加失败'
+        })
+    }
+}
+// 属性值输入框失去焦点时触发
+const toLook = (row: any, $index: any) => {
+    // 判断是否为空
+    if (row.valueName) {
+        // 判断是否重复
+        const res = attrParams.attrValueList.find((item: any) => item.valueName === row.valueName)
+        if (res !== row) {
+            ElMessage({
+                type: 'error',
+                message: '属性值不能重复'
+            })
+            attrParams.attrValueList.splice($index, 1)
+        } else {
+            row.choose = false
+        }
+    } else {
+        ElMessage({
+            type: 'error',
+            message: '属性值不能为空'
+        })
+        attrParams.attrValueList.splice($index, 1)
+    }
+}
+onMounted(async () => {
     await attrStore.getC1()
-    
+
 })
 </script>
 
@@ -78,5 +216,4 @@ onMounted(async()=>{
     display: flex;
     align-items: center;
 }
-  
 </style>
