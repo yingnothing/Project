@@ -37,6 +37,7 @@
                 <!-- 当没有选择三个选项的话不能添加 -->
                 <el-button type="primary" icon="Plus" :disabled="!attrStore.selectThree"
                     @click="addAttr">添加属性</el-button>
+                    <!-- 列表 -->
                 <el-table :border="true" :data="attrStore.categoryList">
                     <el-table-column label="序号" type="index" width="80px">
                     </el-table-column>
@@ -52,9 +53,9 @@
                     </el-table-column>
                     <!-- 按钮 -->
                     <el-table-column label="操作" width="200px">
-                        <template #>
-                            <el-button link type="primary" size="small" icon="Edit">修改</el-button>
-                            <el-popconfirm title="确认删除？">
+                        <template #="{row}">
+                            <el-button link type="primary" size="small" icon="Edit" @click="toEdit(row)">修改</el-button>
+                            <el-popconfirm title="确认删除？" @confirm="confirmDeleteAttr(row)">
                                 <template #reference>
                                     <el-button>删除</el-button>
                                 </template>
@@ -85,14 +86,18 @@
                 </el-table-column>
                 <el-table-column label="属性值">
                     <template #="{ row, $index }">
-                        <el-input placeholder="请输入属性值名称" v-model="row.valueName" v-if="row.choose"
-                            @blur="toLook(row, $index)"></el-input>
-                        <div v-else @click="row.choose = true">
+                        <!-- ref可以绑定一个函数，函数参数是该组件实例，index代表第几个对象，因为有几个对象就有几个input实例，所以也可以用于索引代表第几个组件实例 -->
+                        <el-input :ref="(vc: any) => inputArr[$index] = vc" placeholder="请输入属性值名称" v-model="row.valueName"
+                            v-if="row.choose" @blur="toLook(row, $index)"></el-input>
+                        <div v-else @click="toChoose(row, $index)">
                             {{ row.valueName }}
                         </div>
                     </template>
                 </el-table-column> <el-table-column label="属性值操作">
-
+                    <template #="{$index}">
+                        <el-button icon="Delete" @click="attrParams.attrValueList.splice($index,1)"></el-button>
+                    </template>
+                   
                 </el-table-column>
             </el-table>
             <!-- 保存和取消按钮 -->
@@ -106,21 +111,23 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref,nextTick } from 'vue';
 import { useAttrStore, } from '../../../store/modules/attr';
-import { reqAddOrUpdateAttr } from '../../../api/product/attr';
+import { reqAddOrUpdateAttr,reqRemoveAttr } from '../../../api/product/attr';
 import { ElMessage } from 'element-plus';
 
 const attrStore = useAttrStore()
 // 管理卡片切换及选项的可选状态
 let isAdd = ref(false)
-// 收集新增的属性数据
+// 收集新增或修改的属性数据
 let attrParams: any = reactive({
     attrName: "",
     attrValueList: [],
     categoryId: '',
     categoryLevel: 3
 })
+// 收集每个添加的input实例，以便获取焦点
+const inputArr: any = ref([])
 // 当selectOne变化时就调用第二个接口获取数据
 const hander1 = async () => {
     attrStore.selectTow = ''
@@ -139,20 +146,44 @@ const hander3 = async () => {
 }
 // 添加属性
 const addAttr = () => {
+        // 将数据清空
+        attrParams.attrName = ''
+    attrParams.attrValueList = []
     isAdd.value = true
+}
+// 修改属性
+const toEdit=(row:any)=>{
+    Object.assign(attrParams,JSON.parse(JSON.stringify(row)))
+    isAdd.value=true
+}
+// 删除属性
+const confirmDeleteAttr=async(row:any)=>{
+    const res:any=await reqRemoveAttr(row.id)
+    if(res.code===200){
+        ElMessage({
+            type: 'success',
+            message: '删除成功'
+        })
+        await attrStore.getCL()
+    }else{
+        ElMessage({
+            type: 'error',
+            message: '删除失败'
+        })
+    }
 }
 // 添加属性值
 const addAttrValue = () => {
-    // 将数据清空
-    attrParams.attrName = ''
-    attrParams.attrValueList = []
     // 给attrParams.attrValueList数组添加对象，从而增加input
     attrParams.attrValueList.push({
         valueName: '',
         // 增加一个判断是否被选中的标志
         choose: true
     })
+    // 获取最后的el-input组件获取焦点
+    nextTick(()=>inputArr.value[attrParams.attrValueList.length-1].focus())
 }
+
 // 保存属性值，发送请求
 const save = async () => {
     if (attrParams.attrValueList.length === 0 || !attrParams.attrName) {
@@ -160,7 +191,7 @@ const save = async () => {
             type: 'error',
             message: '缺少必要内容'
         })
-        return
+        return 
     }
     isAdd.value = false
     // 保存第三分类的id
@@ -204,6 +235,12 @@ const toLook = (row: any, $index: any) => {
         })
         attrParams.attrValueList.splice($index, 1)
     }
+}
+// 选择输入框时触发
+const toChoose = (row: any, $index: number) => {
+    row.choose = true
+    nextTick(()=>inputArr.value[$index].focus())
+
 }
 onMounted(async () => {
     await attrStore.getC1()

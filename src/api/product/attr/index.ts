@@ -5,7 +5,8 @@ enum API{
     getCategory2_API='/admin/product/getCategory2/',
     getCategory3_API='/admin/product/getCategory3/',
     getCategoryList_API='/admin/product/attrInfoList/',
-    ADDORUPDATEATTR_API='/admin/product/saveAttrInfo'
+    ADDORUPDATEATTR_API='/admin/product/saveAttrInfo',
+    REMOVEATTR_API='/admin/product/deleteAttr/',
 }
 export const getCategory1=async ()=>{
     return await request.get(API.getCategory1_API)
@@ -21,5 +22,8 @@ export const getCategoryList=async(id1:string,id2:string,id3:string)=>{
 }
 export const reqAddOrUpdateAttr=async(data:any)=>{
     return await request.post(API.ADDORUPDATEATTR_API,data)
+}
+export const reqRemoveAttr=async(attrId:number|string)=>{
+    return await request.delete( API.REMOVEATTR_API+attrId)
 }
 
