@@ -151,7 +151,7 @@ export const constantRoute = [
         component: () => import('../views/404/index.vue'),
         meta: {
             title: '404错误',
-            hidden: true,
+            hidden: false,
             icon: 'Close'
         }
     },
@@ -161,7 +161,7 @@ export const constantRoute = [
         name: 'Any',
         meta: {
             title: '任意路由',
-            hidden: true,
+            hidden: false,
             icon: 'Coin'
         }
     }

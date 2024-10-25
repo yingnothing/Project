@@ -47,10 +47,11 @@ const settingIconStore = useSettingIconStore()
     .layout_slider {
         // 用到绝对定位不占位置
         // position: absolute;
+        position: fixed;
         width: $base-menu-width;
         height: 100vh;
         background-color: white;
-
+        overflow: auto;
         &.fold {
             width: $fold-menu-width;
         }
@@ -63,6 +64,8 @@ const settingIconStore = useSettingIconStore()
         height: $base-tabbar-height;
         left: $base-menu-width;
         top: 0;
+        // 确保不被内容区遮挡
+        z-index: 10;
         // 导航是否向左展开
         &.tabbar_expend {
             width: calc(100vw - $fold-menu-width);

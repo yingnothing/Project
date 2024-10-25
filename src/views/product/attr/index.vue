@@ -1,38 +1,8 @@
 <template>
     <div>
-        <el-card style="max-width: 100% ;margin-bottom: 20px;">
-            <div class="card-header">
-                <!-- 行内表单 -->
-                <el-form :inline="true">
-                    <el-form-item label="第一种分类">
-                        <!-- selectOne拿到的是item.id -->
-                        <el-select placeholder="请选择第一种分类" style="width:220px ;" v-model="attrStore.selectOne"
-                            @change="hander1" :disabled="isAdd">
-                            <template v-for="item in attrStore.categoryOneData">
-                                <el-option :label="item.name" :value="item.id">
-                                </el-option>
-                            </template>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="第二种分类">
-                        <el-select placeholder="请选择第二种分类" style="width:220px ;" v-model="attrStore.selectTow"
-                            @change="hander2" :disabled="isAdd">
-                            <el-option v-for="item in attrStore.categoryTowData" :label="item.name" :value="item.id">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="第三种分类">
-                        <el-select placeholder="第三种分类" style="width:220px ;" v-model="attrStore.selectThree"
-                            @change="hander3" :disabled="isAdd">
-                            <el-option v-for="item in attrStore.categoryThreeData" :label="item.name" :value="item.id">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
-            </div>
-        </el-card>
+        <category :isChange="isChange"></category>
         <!-- 下方列表渲染 -->
-        <el-card v-show="!isAdd">
+        <el-card v-show="!isChange">
             <div class="card-body">
                 <!-- 当没有选择三个选项的话不能添加 -->
                 <el-button type="primary" icon="Plus" :disabled="!attrStore.selectThree"
@@ -66,7 +36,7 @@
             </div>
         </el-card>
         <!-- 添加属性时切换到该卡片 -->
-        <el-card v-show="isAdd">
+        <el-card v-show="isChange">
             <!-- 属性名称 -->
             <el-form :inline="true">
                 <el-form-item label="属性名称">
@@ -103,7 +73,7 @@
             <!-- 保存和取消按钮 -->
             <div style="margin-top: 15px;">
                 <el-button type="primary" @click="save">保存</el-button>
-                <el-button @click="isAdd = false">取消</el-button>
+                <el-button @click="isChange = false">取消</el-button>
             </div>
         </el-card>
     </div>
@@ -111,14 +81,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref,nextTick } from 'vue';
+import { onMounted, reactive, ref,nextTick,onBeforeUnmount } from 'vue';
 import { useAttrStore, } from '../../../store/modules/attr';
 import { reqAddOrUpdateAttr,reqRemoveAttr } from '../../../api/product/attr';
 import { ElMessage } from 'element-plus';
+// @ts-ignore
+import category from '../../../components/category/index.vue'
 
 const attrStore = useAttrStore()
 // 管理卡片切换及选项的可选状态
-let isAdd = ref(false)
+let isChange = ref(false)
 // 收集新增或修改的属性数据
 let attrParams: any = reactive({
     attrName: "",
@@ -128,33 +100,18 @@ let attrParams: any = reactive({
 })
 // 收集每个添加的input实例，以便获取焦点
 const inputArr: any = ref([])
-// 当selectOne变化时就调用第二个接口获取数据
-const hander1 = async () => {
-    attrStore.selectTow = ''
-    attrStore.selectThree = ''
-    attrStore.categoryThreeData = []
-    await attrStore.getC2()
-}
-// 当selectTow变化时就调用第三个接口获取数据
-const hander2 = async () => {
-    attrStore.selectThree = ''
-    await attrStore.getC3()
-}
-// 当selectThree变化时就调用接口获取属性列表
-const hander3 = async () => {
-    await attrStore.getCL()
-}
+
 // 添加属性
 const addAttr = () => {
         // 将数据清空
         attrParams.attrName = ''
     attrParams.attrValueList = []
-    isAdd.value = true
+    isChange.value = true
 }
 // 修改属性
 const toEdit=(row:any)=>{
     Object.assign(attrParams,JSON.parse(JSON.stringify(row)))
-    isAdd.value=true
+    isChange.value=true
 }
 // 删除属性
 const confirmDeleteAttr=async(row:any)=>{
@@ -193,7 +150,7 @@ const save = async () => {
         })
         return 
     }
-    isAdd.value = false
+    isChange.value = false
     // 保存第三分类的id
     attrParams.categoryId = attrStore.selectThree
     // 发送请求
@@ -245,6 +202,9 @@ const toChoose = (row: any, $index: number) => {
 onMounted(async () => {
     await attrStore.getC1()
 
+})
+onBeforeUnmount(()=>{
+    attrStore.$reset()
 })
 </script>
 

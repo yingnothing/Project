@@ -42,6 +42,6 @@ export const useAttrStore = defineStore('Attr', {
         async getCL(){
             const res=await getCategoryList(this.selectOne.toString(),this.selectTow.toString(),this.selectThree.toString())
             this.categoryList=res.data
-        }
+        },
     }
 })
