@@ -10,9 +10,9 @@ export interface User{
     id?: number,
     createTime?: string
     updateTime?: string,
-    username: string,
-    password: string,
-    name: string,
+    username?: string,
+    password?: string,
+    name?: string,
     phone?: null,
     roleName?: string
 }
@@ -27,3 +27,25 @@ export interface UserResponseData extends ResponseData{
         "pages": number
     }
 }
+
+// 用户角色数据类型
+export interface userRole{
+    "id"?: number,
+    "createTime"?: string,
+    "updateTime"?:string,
+    "roleName": string,
+    "remark": null
+}
+// 一个角色所拥有的角色类型
+export type userRoleArr=userRole[]
+export interface userRoleResponseData extends ResponseData{
+    data:{
+        "assignRoles":userRoleArr,
+        "allRolesList":userRoleArr
+    }
+}
+// 修改用户角色
+export interface setRoleData{
+    "roleIdList": number[]
+    "userId": number
+  }
