@@ -27,3 +27,22 @@ export interface roleResponseData extends responseData{
     }
    
 }
+// 权限部分
+export interface permissionData{
+    "id": number,
+    "createTime": string,
+    "updateTime":string,
+    "pid": number,
+    "name": string,
+    "code": null,
+    "toCode": null,
+    "type": number,
+    "status": null,
+    "level": number,
+    "children"?: permissionData[],
+    "select": boolean
+}
+export type permissionDataArr=permissionData[]
+export interface permissionResponseData extends responseData{
+    data:permissionDataArr
+}

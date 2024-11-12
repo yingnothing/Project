@@ -29,9 +29,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="300px" align="center">
                     <template #="{row}">
-                        <el-button type="primary" icon="User" size="small">分配权限</el-button>
+                        <el-button type="primary" icon="User" size="small" @click="assignPermissions(row)">分配权限</el-button>
                         <el-button type="primary" icon="Edit" size="small" @click="updateRole(row)">编辑</el-button>
-                        <el-button type="primary" icon="Delete" size="small">删除</el-button>
+                        <el-button type="primary" icon="Delete" size="small" @click="deleteRole(row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -68,14 +68,47 @@
       </div>
     </template>
   </el-dialog>
+  <!-- 分配权限抽屉 -->
+  <el-drawer v-model="drawer" direction="rtl">
+    <template #header>
+      <h4>分配用户权限</h4>
+    </template>
+    <template #default>
+      <div>
+<!-- 树形控件
+ show-checkbox --复选框
+  node-key="id" --树的唯一标识，在data里
+default-expanded-keys --默认展开的节点的 key 的数组(对应树的id)
+default-checked-keys --默认勾选的节点的 key 的数组(对应树的id)
+props --配置文件，用于配置树的children或label的名称
+-->
+    <el-tree
+        ref="tree"
+        style="max-width: 600px"
+        :data="permissionData"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :default-checked-keys="defaultCheckedKeys"
+        :props="defaultProps"
+    />
+      </div>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="drawer=false">取消</el-button>
+        <el-button type="primary" @click="confirmClick">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
   
     </div>
 </template>
 
 <script setup lang="ts">
 import {nextTick, onMounted, reactive, ref} from 'vue'
-import { reqRoleData,reqAddOrUpdateRole } from '../../../api/acl/role';
-import { roleData, roleRecords } from '../../../api/acl/role/type';
+import { reqRoleData,reqAddOrUpdateRole,reqPermissionData,reqSetPermission,reqDeleteRole } from '../../../api/acl/role';
+import { roleData, roleRecords,permissionDataArr,permissionResponseData, } from '../../../api/acl/role/type';
 import useSettingIconStore from '../../../store/modules/SettingIcon';
 import { ElMessage } from 'element-plus';
 // 分页器
@@ -84,11 +117,12 @@ let total=ref<number>(0)
 let pageSize=ref<number>(5)
 // 搜索关键字
 let keyValue=ref('')
-// 存储所有职位
+// 存储当前页所有职位
 const roleArr=ref<roleRecords>([])
 const refreshStore=useSettingIconStore()
 // 获取数据并存储
-const getRoleData=async()=>{
+const getRoleData=async(page=1)=>{
+    pageNo.value=page
     const res=await reqRoleData(pageNo.value,pageSize.value,keyValue.value)
     console.log(res);
     total.value=res.data.total
@@ -100,7 +134,44 @@ const handleSizeChange=()=>{
 }
 // 页数改变
 const handleCurrentChange=()=>{
-    getRoleData()
+    getRoleData(pageNo.value)
+}
+// 树形控件
+let drawer=ref<boolean>(false)
+let tree=ref()
+const defaultProps = {
+  children: 'children',
+  label: 'name',
+}
+let defaultCheckedKeys=ref<any>([])
+// 收集修改的id数组
+let permissionId=ref<number[]>([])
+const permissionData=ref<permissionDataArr>()
+// 分配权限确定按钮
+const confirmClick=async()=>{
+        // 收集新增的id和父节点的部分被选中的id
+    let arr=tree.value.getHalfCheckedKeys()
+    // 收集以被选用的节点
+    let arr1=tree.value.getCheckedKeys()
+    permissionId.value=arr.concat(arr1)
+    // 发送请求
+    const res:any=await reqSetPermission((role.id) as number,permissionId.value)
+    console.log(res);
+    if(res.code==200){
+        ElMessage({
+            type: 'success',
+            message: '分配职位成功'
+        })
+        // 重置一下
+        window.location.reload()
+    }else {
+        ElMessage({
+            type: 'error',
+            message: '分配失败'
+        })
+    }
+    
+    
 }
 // 对话框控制
 const dialogVisible=ref<boolean>(false)
@@ -117,7 +188,6 @@ const search=()=>{
 }
 // 添加职位
 const addRole=()=>{
-
     dialogVisible.value=true
     // 清除上次表单数据
     Object.assign(role,{roleName:'',id:0})
@@ -135,6 +205,47 @@ const validateRoleName=(_rules:any,value:any,callback:any)=>{
     }else{
         callback()
     }
+}
+
+// 分配权限按钮
+const assignPermissions=async (row:roleData)=>{
+    drawer.value=true
+    Object.assign(role,row)
+    const res:permissionResponseData = await reqPermissionData((row.id) as number)
+    console.log(row);
+    console.log(role);
+    
+    permissionData.value=res.data
+    // 筛选出被勾选的id数组
+    const getcheckKeys=(item:any)=>{
+        if(item.children?.length>0){
+            item.children.forEach(getcheckKeys)
+        }else{
+            if(item.select){
+                defaultCheckedKeys.value.push(item.id)
+            }
+        }
+    }
+    permissionData.value.forEach(getcheckKeys)
+   console.log(defaultCheckedKeys.value);
+}
+// 删除职位
+const deleteRole=async(row:roleData)=>{
+    const res =await reqDeleteRole((row.id as number))
+    if(res.code==200){
+        ElMessage({
+            type: 'success',
+            message: '删除成功'
+        })
+        // 重置一下
+        window.location.reload()
+    }else {
+        ElMessage({
+            type: 'error',
+            message: '删除失败'
+        })
+    }
+    getRoleData(roleArr.value.length>1?pageNo.value:pageNo.value-1)
 }
 const formRef=ref()
 // 表单校验规则
