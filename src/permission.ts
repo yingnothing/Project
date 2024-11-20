@@ -18,7 +18,7 @@ router.beforeEach(async (to, _from:any, next) => {
         if (to.path === '/login') {
             // 若是要到登录页，自动返回到首页
             next('/')
-        } else {
+        } else {            
             // 去其它任何地方，先判断是否已通过token拿到用户信息(即发送请求并存在pinia中)
             if (userStore.username) {
                 next()
@@ -26,8 +26,9 @@ router.beforeEach(async (to, _from:any, next) => {
                 try {                
                     // 这个是通过token向服务器发送请求，所以可能失败
                     await userStore.getUserInfo()
+
                     // 发送完信息后再放行
-                    next()
+                    next({...to})
                 } catch(error) {
                     // token过期，拿不到用户数据,进行退出登录操作
                     await userStore.userLogout()

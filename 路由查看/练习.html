@@ -1,12 +1,16 @@
-// // 常量路由,将路由规则放在这里,后面需要拿到
-// import login from '../views/login/index.vue'
-// import layout from '../views/layout/index.vue'
-// import err from '../views/404/index.vue'
-
-
-// import home from '../views/layout/home/index.vue'
-
-export let constantRoute=[
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+<script>
+let constantRoute=[
     {
         path: '/login',
         component: () => import('../views/login/index.vue'),
@@ -59,7 +63,7 @@ export let constantRoute=[
         }
     },
 ]
-export let asyncRoute=[
+let asyncRoute=[
 {
         path: '/acl',
         component: () => import('../views/layout/index.vue'),
@@ -158,7 +162,7 @@ export let asyncRoute=[
     },
 
 ]
-export let anyRoute = [
+let anyRoute = [
 
     {
         path: '/:pathMatch(.*)*',
@@ -171,3 +175,19 @@ export let anyRoute = [
         }
     }
 ]
+
+function routeFilter(asyncRoute,routeArr){
+   
+    // 得到一个路由对象数组
+    return asyncRoute.filter((route)=>{
+        if(routeArr.includes(route.name)){
+            if(route.children&&route.children.length>1){
+                route.children=routeFilter(route.children,routeArr)
+            }
+            return true
+        }
+})
+}
+
+
+</script>

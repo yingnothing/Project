@@ -8,7 +8,7 @@
         <div class="layout_slider" :class="{ fold: settingIconStore.fold }">
             <Logo />
             <!-- 菜单的选项 -->
-            <Menu :constantRoute="constantRoute"></Menu>
+            <Menu :constantRoute="userStore.menuRoutes"></Menu>
         </div>
         <!-- 内容 -->
         <div class="layout_main" :class="{ main_expend: settingIconStore.fold }">
@@ -26,10 +26,12 @@ import Logo from './logo/index.vue';
 import Menu from './menu/index.vue';
 import Main from './main/index.vue'
 import Tabbar from './tabbar/index.vue'
+import { useUserStore } from '../../store/modules/user';
 // 获取路由规则,传给菜单
 import { constantRoute } from '../../router/routes';
 // 引入控制折叠的仓库
 import useSettingIconStore from '../../store/modules/SettingIcon';
+const userStore=useUserStore()
 const settingIconStore = useSettingIconStore()
 </script>
 <script lang="ts">

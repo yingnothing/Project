@@ -5,12 +5,32 @@ import { defineStore } from 'pinia'
 import { reqLogin,reqUserInfo,reqLogout } from '../../api/user';
 // 引入类型
 import { loginFormData,loginRespondData,userInfoResponseData} from '../../api/user/type';
+// 引入路由
+import { asyncRoute,constantRoute,anyRoute } from '../../router/routes';
+// @ts-ignore
+import { cloneDeep } from 'lodash'
+import router from '../../router';
+// 过滤出能访问的路由的数组
+function filterRoute(asyncRoute:any,routeArr:string[]){
+  return asyncRoute.filter((item:any)=>{
+    if(routeArr.includes(item.name)){
+      // 对children进行过滤
+      if(item.children&&item.children.length>=1){
+        item.children=filterRoute(item.children,routeArr)
+      }
+      return true
+    }
+  })
+}
+
 export const useUserStore = defineStore('User', {
   state: () => {
     return { 
       token: localStorage.getItem('TOKEN')||'',
       username:'',
-      avatar:''
+      avatar:'',
+      routeArr:[] as string[],
+      menuRoutes:[] as any
      }
   },
 
@@ -18,7 +38,7 @@ export const useUserStore = defineStore('User', {
     // 点击登录调用的方法
     // 因为发送请求就会得到token，所以把token放在pinia的state里
     async userLogin(loginForm:loginFormData){
-        // 获取服务器数据
+    // 获取服务器数据
     const res:loginRespondData=await reqLogin(loginForm)
     if(res.code===200){
     // 存入token
@@ -34,10 +54,27 @@ export const useUserStore = defineStore('User', {
       const res:userInfoResponseData=await reqUserInfo()
       // 如果成功，则将用户信息存在pinia中，方便其它组件进行渲染
       if(res.code===200){
-         // @ts-ignore
-        this.username=res.data.username
-         // @ts-ignore
+        
+        console.log(res);        
+        this.username=res.data.name
         this.avatar=res.data.avatar
+        
+        // 路由部分
+        // 拿到拥有的路由路径
+        this.routeArr=res.data.routes
+        
+        // 过滤出路由数组
+        const userAsyncRoute:any=filterRoute(cloneDeep(asyncRoute),this.routeArr)
+        console.log(userAsyncRoute);
+
+        // 最终的路由数组
+        this.menuRoutes=[...userAsyncRoute,...constantRoute,...anyRoute] 
+        console.log(this.menuRoutes);
+        // 路由目前只有constantRoute
+        [...userAsyncRoute,...anyRoute].forEach((route)=>{
+          router.addRoute(route)
+        })
+               
         return 'ok';
       }else{
         return Promise.reject(new Error(res.message))
