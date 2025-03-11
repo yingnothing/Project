@@ -5,189 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    
-</body>
-</html>
-<script>
-let constantRoute=[
-    {
-        path: '/login',
-        component: () => import('../views/login/index.vue'),
-        meta: {
-            title: '登录页',
-            hidden: true,
-            icon: 'Select'
-        }
-    },
-    {
-        path: '/',
-        component: () => import('../views/layout/index.vue'),
-        children: [
+    <div>
+        <button onclick="testDebounce()">点我测试防抖</button>
+    </div>
+    <script>
+        // #region
+        let constantRoute=[
             {
-                path: '/home',
-                component: () => import('../views/layout/home/index.vue'),
+                path: '/login',
+                component: () => import('../views/login/index.vue'),
                 meta: {
-                    title: '首页',
+                    title: '登录页',
+                    hidden: true,
+                    icon: 'Select'
+                }
+            },
+            {
+                path: '/',
+                component: () => import('../views/layout/index.vue'),
+                children: [
+                    {
+                        path: '/home',
+                        component: () => import('../views/layout/home/index.vue'),
+                        meta: {
+                            title: '首页',
+                            hidden: false,
+                            icon: 'House'
+                        }
+                    },
+                ],
+                // 添加显示该路由的名字
+                meta: {
                     hidden: false,
                     icon: 'House'
-                }
+                },
+                // '/'为layout，'.home'为layout+home,默认展示到二级路由home
+                redirect: '/home'
+        
             },
-        ],
-        // 添加显示该路由的名字
-        meta: {
-            hidden: false,
-            icon: 'House'
-        },
-        // '/'为layout，'.home'为layout+home,默认展示到二级路由home
-        redirect: '/home'
-
-    },
-    {
-        path: '/screen',
-        component: () => import('../views/screen/index.vue'),
-        name: 'Screen',
-        meta: {
-            title: 'Screen',
-            hidden: false,
-            icon: 'Platform'
-        }
-    },
-    {
-        path: '/404',
-        component: () => import('../views/404/index.vue'),
-        meta: {
-            title: '404错误',
-            hidden: false,
-            icon: 'Close'
-        }
-    },
-]
-let asyncRoute=[
-{
-        path: '/acl',
-        component: () => import('../views/layout/index.vue'),
-        name: 'Acl',
-        meta: {
-            title: '权限管理',
-            hidden: false,
-            icon: 'Lock'
-        },
-        redirect:'/acl/user',
-        children: [
             {
-                path: '/acl/user',
-                component: () => import('../views/acl/user/index.vue'),
-                name:'User',
-                meta:{
-                    title:'用户管理',
-                    hidden:false,
-                    icon:'User'
+                path: '/screen',
+                component: () => import('../views/screen/index.vue'),
+                name: 'Screen',
+                meta: {
+                    title: 'Screen',
+                    hidden: false,
+                    icon: 'Platform'
                 }
             },
             {
-                path: '/acl/role',
-                component: () => import('../views/acl/role/index.vue'),
-                name:'Role',
-                meta:{
-                    title:'角色管理',
-                    hidden:false,
-                    icon:'UserFilled'
-                }
-            },
-            {
-                path: '/acl/permission',
-                component: () => import('../views/acl/permission/index.vue'),
-                name:'Permission',
-                meta:{
-                    title:'菜单管理',
-                    hidden:false,
-                    icon:'UserFilled'
+                path: '/404',
+                component: () => import('../views/404/index.vue'),
+                meta: {
+                    title: '404错误',
+                    hidden: false,
+                    icon: 'Close'
                 }
             },
         ]
-    },
-    {
-        path: '/product',
-        component: () => import('../views/layout/index.vue'),
-        name: 'Product',
-        meta: {
-            title: '商品管理',
-            hidden: false,
-            icon: 'Goods'
-        },
-        redirect:'/product/trademark',
-        children: [
-            {
-                path: '/product/trademark',
-                component: () => import('../views/product/trademark/index.vue'),
-                name: 'Trademark',
+        let asyncRoute=[
+        {
+                path: '/acl',
+                component: () => import('../views/layout/index.vue'),
+                name: 'Acl',
                 meta: {
-                    title: '品牌管理',
-                    icon: 'ShoppingCartFull',
-                    hidden: false
-                }
+                    title: '权限管理',
+                    hidden: false,
+                    icon: 'Lock'
+                },
+                redirect:'/acl/user',
+                children: [
+                    {
+                        path: '/acl/user',
+                        component: () => import('../views/acl/user/index.vue'),
+                        name:'User',
+                        meta:{
+                            title:'用户管理',
+                            hidden:false,
+                            icon:'User'
+                        }
+                    },
+                    {
+                        path: '/acl/role',
+                        component: () => import('../views/acl/role/index.vue'),
+                        name:'Role',
+                        meta:{
+                            title:'角色管理',
+                            hidden:false,
+                            icon:'UserFilled'
+                        }
+                    },
+                    {
+                        path: '/acl/permission',
+                        component: () => import('../views/acl/permission/index.vue'),
+                        name:'Permission',
+                        meta:{
+                            title:'菜单管理',
+                            hidden:false,
+                            icon:'UserFilled'
+                        }
+                    },
+                ]
             },
             {
-                path: '/product/attr',
-                component: () => import('../views/product/attr/index.vue'),
-                name: 'Attr',
+                path: '/product',
+                component: () => import('../views/layout/index.vue'),
+                name: 'Product',
                 meta: {
-                    title: '属性管理',
-                    icon: 'ChromeFilled',
-                    hidden: false
-                }
+                    title: '商品管理',
+                    hidden: false,
+                    icon: 'Goods'
+                },
+                redirect:'/product/trademark',
+                children: [
+                    {
+                        path: '/product/trademark',
+                        component: () => import('../views/product/trademark/index.vue'),
+                        name: 'Trademark',
+                        meta: {
+                            title: '品牌管理',
+                            icon: 'ShoppingCartFull',
+                            hidden: false
+                        }
+                    },
+                    {
+                        path: '/product/attr',
+                        component: () => import('../views/product/attr/index.vue'),
+                        name: 'Attr',
+                        meta: {
+                            title: '属性管理',
+                            icon: 'ChromeFilled',
+                            hidden: false
+                        }
+                    },
+                    {
+                        path: '/product/spu',
+                        component: () => import('../views/product/spu/index.vue'),
+                        name: 'Spu',
+                        meta: {
+                            title: 'SPU管理',
+                            icon: 'Calendar',
+                            hidden: false
+                        }
+                    },
+                    {
+                        path: '/product/sku',
+                        component: () => import('../views/product/sku/index.vue'),
+                        name: 'Sku',
+                        meta: {
+                            title: 'SKU管理',
+                            icon: 'Orange',
+                            hidden: false
+                        }
+                    },
+                ]
             },
-            {
-                path: '/product/spu',
-                component: () => import('../views/product/spu/index.vue'),
-                name: 'Spu',
-                meta: {
-                    title: 'SPU管理',
-                    icon: 'Calendar',
-                    hidden: false
-                }
-            },
-            {
-                path: '/product/sku',
-                component: () => import('../views/product/sku/index.vue'),
-                name: 'Sku',
-                meta: {
-                    title: 'SKU管理',
-                    icon: 'Orange',
-                    hidden: false
-                }
-            },
+        
         ]
-    },
-
-]
-let anyRoute = [
-
-    {
-        path: '/:pathMatch(.*)*',
-        redirect: '/404',
-        name: 'Any',
-        meta: {
-            title: '任意路由',
-            hidden: false,
-            icon: 'Coin'
-        }
-    }
-]
-
-function routeFilter(asyncRoute,routeArr){
-   
-    // 得到一个路由对象数组
-    return asyncRoute.filter((route)=>{
-        if(routeArr.includes(route.name)){
-            if(route.children&&route.children.length>1){
-                route.children=routeFilter(route.children,routeArr)
+        let anyRoute = [
+        
+            {
+                path: '/:pathMatch(.*)*',
+                redirect: '/404',
+                name: 'Any',
+                meta: {
+                    title: '任意路由',
+                    hidden: false,
+                    icon: 'Coin'
+                }
             }
-            return true
+        ]
+        
+        function routeFilter(asyncRoute,routeArr){
+            // 得到一个路由对象数组
+            return asyncRoute.filter((route)=>{
+                if(routeArr.includes(route.name)){
+                    if(route.children&&route.children.length>1){
+                        route.children=routeFilter(route.children,routeArr)
+                    }
+                    return true
+                }
+        })
         }
-})
-}
-
-
-</script>
+        function a(aR,rA){
+            return aR.filter((item)=>{
+                if(item.children){
+                    item.children= a(item.children,rA)
+                }
+                    return rA.includes(item.name)
+                
+            })
+        }
+       // #endregion 
+        const  mydebounce=(fn,delay=2000,immediate=false)=>{
+            let timer=null
+            return function(...args){
+                let context=this
+                timer&&clearTimeout(timer)
+                if(immediate){
+                    if(timer===null){
+                    fn.apply(context,args)
+                    timer=setTimeout(()=>{
+                        timer=null
+                    },delay)
+                }
+                }else{
+                    timer=setTimeout(()=>{
+                        fn.apply(context,args)
+                        timer=null
+                    },delay)
+                }
+            }
+        }
+        function test(){
+            console.log('123');
+        }
+        const testDebounce=mydebounce(test,1000)
+        </script>
+</body>
+</html>

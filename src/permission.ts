@@ -26,8 +26,7 @@ router.beforeEach(async (to, _from:any, next) => {
                 try {                
                     // 这个是通过token向服务器发送请求，所以可能失败
                     await userStore.getUserInfo()
-
-                    // 发送完信息后再放行
+                    // 发送完信息后再放行，...to是告诉 Vue Router 重新匹配当前路由。
                     next({...to})
                 } catch(error) {
                     // token过期，拿不到用户数据,进行退出登录操作

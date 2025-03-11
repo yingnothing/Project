@@ -2,7 +2,7 @@
 <template>
   <!-- 卡片 -->
   <el-card style="max-width: 100%">
-    <el-button type="primary" icon="Plus" @click="add">添加品牌</el-button>
+    <el-button type="primary" icon="Plus" @click="add" v-has="`btn.Trademark.add`">添加品牌</el-button>
     <!-- 表格组件
     tableData 表格数据
     label 数据标签

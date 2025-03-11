@@ -246,6 +246,7 @@ const cancle = () => {
 // 初始化，点击修改则发送请求获取初始数据，需要暴露在父组件中被调用
 const initSkuData = async (row: any) => {
     let res
+    // 获取菜单
     res = await reqAllTrademark()
     allTrademark.value = res.data
     console.log(row);

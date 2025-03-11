@@ -30,7 +30,8 @@ export const useUserStore = defineStore('User', {
       username:'',
       avatar:'',
       routeArr:[] as string[],
-      menuRoutes:[] as any
+      menuRoutes:[] as any,
+      buttonArry:[] as string[]
      }
   },
 
@@ -54,22 +55,20 @@ export const useUserStore = defineStore('User', {
       const res:userInfoResponseData=await reqUserInfo()
       // 如果成功，则将用户信息存在pinia中，方便其它组件进行渲染
       if(res.code===200){
+        console.log(res);
         
-        console.log(res);        
         this.username=res.data.name
         this.avatar=res.data.avatar
-        
+        this.buttonArry=res.data.buttons
         // 路由部分
         // 拿到拥有的路由路径
         this.routeArr=res.data.routes
         
         // 过滤出路由数组
         const userAsyncRoute:any=filterRoute(cloneDeep(asyncRoute),this.routeArr)
-        console.log(userAsyncRoute);
 
-        // 最终的路由数组
-        this.menuRoutes=[...userAsyncRoute,...constantRoute,...anyRoute] 
-        console.log(this.menuRoutes);
+        // 最终的菜单路由数组
+        this.menuRoutes=[...constantRoute,...userAsyncRoute,...anyRoute] ;
         // 路由目前只有constantRoute
         [...userAsyncRoute,...anyRoute].forEach((route)=>{
           router.addRoute(route)

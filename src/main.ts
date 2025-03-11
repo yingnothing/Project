@@ -15,6 +15,8 @@ import router from './router';
 import pinia from './store'
 // 执行路由守卫
 import './permission'
+// 引入自定义指令
+import { hasButton } from './diretive/has'
 
 const app = createApp(App)
 
@@ -23,6 +25,7 @@ app.use(globalcomponents)
 app.use(ElementPlus, {
     locale: zhCn,
   })
+  hasButton(app)
 app.use(router)
 app.use(pinia)
 app.mount('#app')
